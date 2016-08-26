@@ -197,31 +197,6 @@ func newMasterStateCollector(url string, timeout time.Duration) *masterCollector
 					c.(*prometheus.GaugeVec).WithLabelValues(s.PID).Set(float64(size))
 				}
 			},
-			prometheus.NewGaugeVec(prometheus.GaugeOpts{
-				Help:      "Framework tasks",
-				Namespace: "mesos",
-				Subsystem: "slave",
-				Name:      "task_state_time",
-			}, []string{"slave", "task", "executor", "name", "framework", "state"}): func(st *state, c prometheus.Collector) {
-				for _, f := range st.Frameworks {
-					if !f.Active {
-						continue
-					}
-					for _, task := range f.Completed {
-						values := []string{
-							task.ID,
-							task.SlaveID,
-							task.ExecutorID,
-							task.Name,
-							task.FrameworkID,
-							task.State,
-						}
-						if len(task.Statuses) > 0 {
-							c.(*prometheus.GaugeVec).WithLabelValues(values...).Set(task.Statuses[0].Timestamp)
-						}
-					}
-				}
-			},
 		},
 	}
 }
